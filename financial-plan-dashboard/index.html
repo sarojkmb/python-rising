@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5-Year Financial Plan Dashboard</title>
+  <style>
+    :root {
+      --ink: #17201b;
+      --muted: #66706a;
+      --line: #d9ded8;
+      --panel: #ffffff;
+      --bg: #f5f7f2;
+      --green: #2f6f4e;
+      --teal: #1d6d74;
+      --amber: #a76513;
+      --rose: #a44747;
+      --indigo: #3f5f8f;
+      --soft-green: #e8f2ea;
+      --soft-teal: #e4f0f1;
+      --soft-amber: #f6ecdc;
+      --soft-rose: #f5e7e5;
+      --shadow: 0 16px 36px rgba(23, 32, 27, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input, select { font: inherit; }
+    .shell { min-height: 100vh; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(245, 247, 242, 0.94);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand { min-width: 0; }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 40px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .print-button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      padding: 10px 14px;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(23, 32, 27, 0.06);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 22px 56px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .metric, .panel, .timeline-item, .task {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .metric { min-height: 124px; padding: 16px; }
+    .metric-label { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .metric-value { margin-top: 8px; font-size: 28px; font-weight: 850; }
+    .metric-note { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.4; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel { margin-bottom: 18px; overflow: hidden; }
+
+    .panel-head {
+      padding: 18px 18px 12px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-title { margin: 0; font-size: 19px; line-height: 1.2; }
+    .panel-copy { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .panel-body { padding: 18px; }
+
+    .pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .pill.green { background: var(--soft-green); color: var(--green); }
+    .pill.amber { background: var(--soft-amber); color: var(--amber); }
+    .pill.teal { background: var(--soft-teal); color: var(--teal); }
+
+    .allocation {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .allocation-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fbfcfa;
+    }
+
+    .allocation-row strong { display: block; margin-bottom: 8px; font-size: 15px; }
+    .allocation-row span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .amount { float: right; color: var(--ink); font-weight: 850; }
+
+    .bar {
+      height: 10px;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #edf0ec;
+    }
+
+    .fill { height: 100%; border-radius: 999px; }
+    .fill.green { background: var(--green); }
+    .fill.teal { background: var(--teal); }
+    .fill.amber { background: var(--amber); }
+    .fill.indigo { background: var(--indigo); }
+
+    .timeline { display: grid; gap: 12px; }
+
+    .timeline-item {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 14px;
+    }
+
+    .time-label { color: var(--green); font-size: 14px; font-weight: 850; }
+    .timeline-item h3 { margin: 0 0 6px; font-size: 16px; }
+    .timeline-item p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+
+    .task-list { display: grid; gap: 10px; }
+
+    .task {
+      padding: 13px 14px;
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 10px;
+      align-items: start;
+      box-shadow: none;
+    }
+
+    .check {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--green);
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .task strong { display: block; margin-bottom: 3px; font-size: 14px; }
+    .task span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    .warning {
+      border-left: 4px solid var(--rose);
+      background: var(--soft-rose);
+      color: #5c2626;
+      padding: 13px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .callout {
+      border-left: 4px solid var(--green);
+      background: var(--soft-green);
+      padding: 13px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    @media (max-width: 900px) {
+      .summary-grid, .layout, .allocation { grid-template-columns: 1fr; }
+      .topbar-inner { align-items: flex-start; flex-direction: column; }
+      .timeline-item { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      body { background: white; }
+      .topbar { position: static; }
+      .print-button { display: none; }
+      .metric, .panel, .timeline-item { box-shadow: none; }
+      main { padding-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <p class="eyebrow">Bangalore | Age 26 | 5-Year Roadmap</p>
+          <h1>Financial Plan Dashboard</h1>
+          <p class="subtitle">A hands-off plan for building a wedding fund, keeping safety money intact, and gradually increasing long-term SIPs without taking unnecessary risk.</p>
+        </div>
+        <button class="print-button" type="button" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="summary-grid" aria-label="Financial snapshot">
+        <div class="metric"><div class="metric-label">Monthly Take-Home</div><div class="metric-value">~₹92k</div><div class="metric-note">After recent promotion estimate.</div></div>
+        <div class="metric"><div class="metric-label">Monthly Spending</div><div class="metric-value">₹58k-60k</div><div class="metric-note">Keep this from rising automatically.</div></div>
+        <div class="metric"><div class="metric-label">Liquid Savings</div><div class="metric-value">₹5L</div><div class="metric-note">Use mainly for emergency and wedding seed.</div></div>
+        <div class="metric"><div class="metric-label">Current Investing</div><div class="metric-value">₹10k/mo</div><div class="metric-note">₹6k SIP + ₹4k EPF from salary.</div></div>
+      </section>
+
+      <div class="layout">
+        <section>
+          <article class="panel">
+            <div class="panel-head"><div><h2 class="panel-title">Target Monthly Allocation</h2><p class="panel-copy">The plan uses the promotion raise without letting the new salary disappear into lifestyle creep.</p></div><span class="pill green">Start now</span></div>
+            <div class="panel-body"><div class="allocation">
+              <div class="allocation-row"><strong>Core expenses <span class="amount">₹58k-60k</span></strong><span>Rent, food, cabs, personal spending. Keep this as the ceiling for now.</span><div class="bar"><div class="fill amber" style="width:65%"></div></div></div>
+              <div class="allocation-row"><strong>Wedding fund <span class="amount">₹15k</span></strong><span>RD, FD, or liquid fund. Do not put 2-3 year wedding money in equity.</span><div class="bar"><div class="fill green" style="width:16%"></div></div></div>
+              <div class="allocation-row"><strong>Long-term SIP <span class="amount">₹10k → ₹15k</span></strong><span>Increase gently from current ₹6k. Use direct mutual funds, growth option.</span><div class="bar"><div class="fill teal" style="width:16%"></div></div></div>
+              <div class="allocation-row"><strong>EPF <span class="amount">₹4k</span></strong><span>Continue. This is the safer retirement base alongside equity SIPs.</span><div class="bar"><div class="fill indigo" style="width:4%"></div></div></div>
+            </div></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><h2 class="panel-title">5-Year Timeline</h2><p class="panel-copy">Milestones are sequenced to protect short-term goals first, then increase long-term compounding.</p></div><span class="pill teal">Hands-off</span></div>
+            <div class="panel-body"><div class="timeline">
+              <div class="timeline-item"><div class="time-label">First 30 Days</div><div><h3>Organize and automate</h3><p>Separate ₹3.5L-₹4L as emergency fund. Move ₹1L-₹1.5L into a wedding fund bucket. Confirm current SIP fund names and check whether they are Direct Growth. Set a ₹15k/month wedding RD or liquid fund transfer.</p></div></div>
+              <div class="timeline-item"><div class="time-label">90 Days</div><div><h3>Raise SIP from ₹6k to ₹10k</h3><p>Use one index fund as the core. Keep wedding money separate. Review actual spending after promotion and make sure monthly expenses have not crossed ₹60k-62k.</p></div></div>
+              <div class="timeline-item"><div class="time-label">6 Months</div><div><h3>Move SIP toward ₹13k</h3><p>If the first six months feel manageable, increase SIP. Keep emergency fund untouched. Buy an independent personal health policy if she wants protection outside employer coverage.</p></div></div>
+              <div class="timeline-item"><div class="time-label">1 Year</div><div><h3>Reach ₹15k SIP</h3><p>Target ₹10k in a Nifty 50 or Nifty 500 index fund and ₹5k in a flexi-cap fund. Keep wedding fund on track at ₹15k/month. Do not add stocks yet unless she has a learning-only budget.</p></div></div>
+              <div class="timeline-item"><div class="time-label">2 Years</div><div><h3>Wedding fund should be nearly ready</h3><p>Expected wedding bucket: about ₹4.6L-₹5L depending on returns and starting seed. Keep it safe. Reduce market risk further if the wedding is within 12 months.</p></div></div>
+              <div class="timeline-item"><div class="time-label">3 Years</div><div><h3>Complete wedding goal and reset</h3><p>After wedding spending, rebuild emergency fund if used. Redirect the ₹15k wedding savings into long-term SIP, house down-payment fund, or both.</p></div></div>
+              <div class="timeline-item"><div class="time-label">4 Years</div><div><h3>Start house fund seriously</h3><p>If buying in Bangalore is still 5+ years away, use mostly equity mutual funds. If purchase is closer than 5 years, use a safer mix with FD/debt allocation.</p></div></div>
+              <div class="timeline-item"><div class="time-label">5 Years</div><div><h3>Shift to wealth-building mode</h3><p>Target ₹30k-₹40k/month total long-term investing if income has grown. Keep 6 months emergency fund, personal health cover, EPF, and simple direct mutual fund SIPs.</p></div></div>
+            </div></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head"><div><h2 class="panel-title">Investment Map</h2><p class="panel-copy">Each goal gets a different instrument because timelines matter more than return chasing.</p></div></div>
+            <div class="panel-body"><table><thead><tr><th>Goal</th><th>Timeline</th><th>Instrument</th><th>Monthly Action</th></tr></thead><tbody>
+              <tr><td>Emergency fund</td><td>Always</td><td>Bank savings + sweep FD / FD</td><td>Keep ₹3.5L-₹4L untouched</td></tr>
+              <tr><td>Wedding</td><td>2-3 years</td><td>Bank RD/FD, liquid fund, limited NBFC FD</td><td>₹15k/month</td></tr>
+              <tr><td>Retirement wealth</td><td>20+ years</td><td>EPF + equity mutual funds</td><td>₹4k EPF + SIP step-up</td></tr>
+              <tr><td>House someday</td><td>7+ years if not fixed</td><td>Equity index funds now, safer mix later</td><td>Redirect wedding savings after goal is done</td></tr>
+            </tbody></table></div>
+          </article>
+        </section>
+
+        <aside>
+          <article class="panel"><div class="panel-head"><div><h2 class="panel-title">30-Day Checklist</h2><p class="panel-copy">The first month is mostly setup, not optimization.</p></div></div><div class="panel-body"><div class="task-list">
+            <div class="task"><div class="check">1</div><div><strong>Label ₹5L savings</strong><span>₹3.5L-₹4L emergency, ₹1L-₹1.5L wedding seed.</span></div></div>
+            <div class="task"><div class="check">2</div><div><strong>Check current SIP</strong><span>Confirm fund name, category, Direct vs Regular, Growth vs IDCW.</span></div></div>
+            <div class="task"><div class="check">3</div><div><strong>Open MF Central</strong><span>Use it to view all mutual funds across AMCs.</span></div></div>
+            <div class="task"><div class="check">4</div><div><strong>Create wedding transfer</strong><span>Automate ₹15k/month into RD, FD, or liquid fund.</span></div></div>
+            <div class="task"><div class="check">5</div><div><strong>Set expense ceiling</strong><span>Keep spending near ₹60k after promotion.</span></div></div>
+          </div></div></article>
+
+          <article class="panel"><div class="panel-head"><div><h2 class="panel-title">App Stack</h2><p class="panel-copy">Simple tools, fewer temptations.</p></div></div><div class="panel-body"><table><tbody>
+            <tr><td>Bank app</td><td>Emergency fund, RD, FD</td></tr>
+            <tr><td>MF Central</td><td>Track and service mutual funds</td></tr>
+            <tr><td>Kuvera / Groww / AMC</td><td>Direct Growth SIPs</td></tr>
+            <tr><td>Stock broker</td><td>Skip for now unless learning with tiny money</td></tr>
+          </tbody></table></div></article>
+
+          <article class="panel"><div class="panel-head"><div><h2 class="panel-title">Suggested SIP Ladder</h2><p class="panel-copy">Designed for a nervous investor who may sell during drops.</p></div><span class="pill amber">Gradual</span></div><div class="panel-body"><table><thead><tr><th>When</th><th>SIP</th></tr></thead><tbody>
+            <tr><td>Now</td><td>₹6k current</td></tr>
+            <tr><td>90 days</td><td>₹10k</td></tr>
+            <tr><td>6 months</td><td>₹13k</td></tr>
+            <tr><td>1 year</td><td>₹15k</td></tr>
+            <tr><td>After wedding</td><td>₹25k-₹30k</td></tr>
+          </tbody></table></div></article>
+
+          <article class="panel"><div class="panel-head"><div><h2 class="panel-title">Do Not Buy</h2><p class="panel-copy">These create complexity before she needs it.</p></div></div><div class="panel-body"><div class="warning">Avoid ULIPs, endowment plans, crypto, F&O, sector funds, stock tips, and putting wedding money in equity. Limit Shriram/NBFC FD exposure because it is not the same safety category as a bank FD.</div></div></article>
+
+          <article class="panel"><div class="panel-head"><div><h2 class="panel-title">Market Fall Rule</h2><p class="panel-copy">This rule matters more than fund selection.</p></div></div><div class="panel-body"><div class="callout">If equity mutual funds fall 20-30%, do not sell long-term SIPs. Continue the SIP. Only money needed within 3 years should be outside equity before the fall happens.</div><p class="small">Educational planning only. Confirm tax and product suitability with a qualified advisor or CA before acting.</p></div></article>
+        </aside>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
