@@ -1,644 +1,1115 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Financial Planning Dashboard | Pratyasha Sahu</title>
-  <style>
-    :root {
-      --bg: #070b14;
-      --panel: #0f1728;
-      --panel-2: #111b31;
-      --line: #26324b;
-      --line-soft: #1b263b;
-      --text: #eef4ff;
-      --muted: #8e9ab1;
-      --green: #58d6b0;
-      --coral: #ff7474;
-      --violet: #a98cff;
-      --amber: #ffc857;
-      --cyan: #68d7ee;
-      --blue: #78a6ff;
-      --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(88, 214, 176, 0.14), transparent 28rem),
-        radial-gradient(circle at top right, rgba(169, 140, 255, 0.12), transparent 28rem),
-        var(--bg);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      letter-spacing: 0;
-    }
-
-    button {
-      font: inherit;
-    }
-
-    .dashboard {
-      max-width: 1220px;
-      margin: 0 auto;
-      padding: 32px 18px 60px;
-    }
-
-    .shell {
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: rgba(10, 16, 29, 0.92);
-      box-shadow: var(--shadow);
-    }
-
-    header {
-      padding: 32px;
-      border-bottom: 1px solid var(--line);
-      background: linear-gradient(135deg, rgba(17, 27, 49, 0.96), rgba(8, 13, 24, 0.96));
-    }
-
-    .header-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .kicker {
-      margin: 0 0 10px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(32px, 5vw, 64px);
-      line-height: 0.96;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .person {
-      display: block;
-      color: var(--green);
-      font-size: 0.48em;
-      margin-top: 10px;
-      text-transform: none;
-    }
-
-    .header-meta {
-      margin: 14px 0 0;
-      max-width: 680px;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.55;
-    }
-
-    .score-card {
-      min-width: 220px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      background: rgba(15, 23, 40, 0.88);
-    }
-
-    .score-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .score {
-      margin-top: 10px;
-      color: var(--green);
-      font-size: 44px;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .score-note {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-top: 28px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-    }
-
-    .tab {
-      border: 1px solid transparent;
-      border-radius: 999px;
-      color: var(--muted);
-      background: transparent;
-      cursor: pointer;
-      padding: 11px 18px;
-      white-space: nowrap;
-    }
-
-    .tab.active {
-      border-color: #3b4a68;
-      color: var(--text);
-      background: #1b2740;
-    }
-
-    main {
-      padding: 28px 32px 34px;
-    }
-
-    .view {
-      display: none;
-    }
-
-    .view.active {
-      display: block;
-    }
-
-    .grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .track-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .two-col {
-      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
-      align-items: start;
-      margin-top: 18px;
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: var(--panel);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
-    }
-
-    .track-card {
-      min-height: 224px;
-      padding: 22px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .track-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto;
-      height: 3px;
-      background: var(--accent);
-    }
-
-    .track-icon {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border-radius: 10px;
-      color: #06101a;
-      background: var(--accent);
-      font-weight: 900;
-    }
-
-    .track-card h2 {
-      margin: 20px 0 10px;
-      font-size: 17px;
-      line-height: 1.35;
-    }
-
-    .track-value {
-      color: var(--accent);
-      font-size: 38px;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .track-meta {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .progress {
-      height: 8px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: #202b42;
-      margin-top: 18px;
-    }
-
-    .progress span {
-      display: block;
-      height: 100%;
-      width: var(--value);
-      border-radius: inherit;
-      background: var(--accent);
-    }
-
-    .card-head {
-      padding: 20px 22px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .card-title {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: #c8d2e4;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--accent, var(--green));
-      box-shadow: 0 0 18px var(--accent, var(--green));
-    }
-
-    .card-body {
-      padding: 18px 22px 22px;
-    }
-
-    .task {
-      display: grid;
-      grid-template-columns: 26px 1fr auto;
-      gap: 12px;
-      align-items: start;
-      padding: 13px 0;
-      border-bottom: 1px solid var(--line-soft);
-    }
-
-    .task:last-child {
-      border-bottom: 0;
-    }
-
-    .box {
-      width: 17px;
-      height: 17px;
-      margin-top: 2px;
-      border: 2px solid var(--green);
-      border-radius: 5px;
-    }
-
-    .task strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 15px;
-      line-height: 1.35;
-    }
-
-    .task span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .tag {
-      border-radius: 7px;
-      color: var(--accent);
-      background: rgba(255, 255, 255, 0.06);
-      padding: 4px 8px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .goal-list {
-      display: grid;
-      gap: 15px;
-    }
-
-    .goal h3 {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 14px;
-      text-transform: uppercase;
-    }
-
-    .goal p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .timeline {
-      display: grid;
-      gap: 14px;
-    }
-
-    .milestone {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 16px;
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: var(--panel);
-    }
-
-    .when {
-      color: var(--green);
-      font-size: 14px;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .milestone h3 {
-      margin: 0 0 7px;
-      font-size: 17px;
-    }
-
-    .milestone p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    th,
-    td {
-      padding: 13px 10px;
-      border-bottom: 1px solid var(--line-soft);
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-    }
-
-    tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .rule {
-      border-left: 4px solid var(--coral);
-      border-radius: 12px;
-      background: rgba(255, 116, 116, 0.08);
-      padding: 14px 15px;
-      color: #ffd6d6;
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .small {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    @media (max-width: 980px) {
-      .header-row,
-      .track-grid,
-      .two-col,
-      .split {
-        grid-template-columns: 1fr;
-      }
-
-      .score-card {
-        min-width: 0;
-      }
-    }
-
-    @media (max-width: 620px) {
-      .dashboard {
-        padding: 0;
-      }
-
-      .shell {
-        border-radius: 0;
-      }
-
-      header,
-      main {
-        padding: 24px 18px;
-      }
-
-      .track-card {
-        min-height: auto;
-      }
-
-      .milestone {
-        grid-template-columns: 1fr;
-      }
-
-      .task {
-        grid-template-columns: 24px 1fr;
-      }
-
-      .task .tag {
-        grid-column: 2;
-        width: max-content;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pratyasha Sahu — Financial Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #7B9E87; --sage-light: #A8C5B0; --sage-pale: #E8F0EA;
+    --gold: #C9A84C; --gold-light: #F0D98B; --gold-pale: #FBF5E4;
+    --coral: #D4735E; --coral-pale: #FAF0ED;
+    --navy: #1E2B3A; --slate: #4A5568; --muted: #8898A8;
+    --bg: #F7F5F0; --white: #FFFFFF;
+    --card-shadow: 0 2px 16px rgba(30,43,58,0.07);
+    --radius: 16px; --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--navy); min-height: 100vh; }
+
+  .header { background: var(--navy); padding: 40px 48px 32px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; background: rgba(201,168,76,0.1); }
+  .header::after { content: ''; position: absolute; bottom: -80px; left: 20%; width: 200px; height: 200px; border-radius: 50%; background: rgba(123,158,135,0.1); }
+  .header-label { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: white; line-height: 1.15; margin-bottom: 8px; }
+  .header p { color: rgba(255,255,255,0.55); font-size: 14px; max-width: 560px; }
+  .header-badges { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .badge { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+
+  /* HEAD-START BANNER */
+  .headstart-banner {
+    background: linear-gradient(135deg, #1A3A2A 0%, #2D5A3D 100%);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .hs-icon { font-size: 32px; flex-shrink: 0; }
+  .hs-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--gold-light); margin-bottom: 6px; }
+  .hs-body { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.7; }
+  .hs-body strong { color: var(--gold-light); }
+
+  .tabs-bar { background: var(--white); border-bottom: 1px solid #E2E8F0; display: flex; padding: 0 48px; overflow-x: auto; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .tab-btn { padding: 16px 20px; font-size: 13.5px; font-weight: 500; color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 7px; }
+  .tab-btn:hover { color: var(--navy); }
+  .tab-btn.active { color: var(--navy); border-bottom-color: var(--gold); font-weight: 600; }
+  .tab-icon { font-size: 15px; }
+
+  .content { padding: 36px 48px 60px; max-width: 1200px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--white); border-radius: var(--radius); padding: 22px 22px 18px; box-shadow: var(--card-shadow); border-top: 3px solid transparent; }
+  .stat-card.green { border-color: var(--sage); }
+  .stat-card.gold { border-color: var(--gold); }
+  .stat-card.coral { border-color: var(--coral); }
+  .stat-card.navy { border-color: var(--navy); }
+  .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .stat-value { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* WEDDING MATH BOX */
+  .wedding-math {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    border-left: 4px solid var(--gold);
+  }
+  .wm-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
+  .wm-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #EEF2F7; font-size: 13.5px; }
+  .wm-row:last-child { border-bottom: none; padding-top: 12px; font-size: 15px; font-weight: 700; color: var(--sage); }
+  .wm-label { color: var(--slate); }
+  .wm-amount { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--navy); }
+  .wm-note { font-size: 11.5px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+
+  .section-heading { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .allocation-card { background: var(--white); border-radius: var(--radius); padding: 24px 28px; box-shadow: var(--card-shadow); margin-bottom: 28px; }
+  .alloc-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 16px; }
+  .alloc-bar { height: 28px; border-radius: 14px; overflow: hidden; display: flex; margin-bottom: 14px; }
+  .alloc-seg { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; }
+  .alloc-legend { display: flex; gap: 20px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--slate); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  .rule-box { background: linear-gradient(135deg, var(--navy) 0%, #2D3F54 100%); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 28px; display: flex; gap: 20px; align-items: flex-start; }
+  .rule-icon { font-size: 36px; flex-shrink: 0; }
+  .rule-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: white; margin-bottom: 6px; }
+  .rule-desc { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.7; }
+
+  .timeline { position: relative; padding-left: 32px; margin-bottom: 32px; }
+  .timeline::before { content: ''; position: absolute; left: 10px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(to bottom, var(--sage), var(--gold), var(--coral)); border-radius: 2px; }
+  .timeline-item { position: relative; margin-bottom: 28px; }
+  .timeline-dot { position: absolute; left: -27px; top: 5px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--sage); }
+  .timeline-dot.gold { box-shadow: 0 0 0 2px var(--gold); background: var(--gold); }
+  .timeline-dot.coral { box-shadow: 0 0 0 2px var(--coral); background: var(--coral); }
+  .timeline-dot.sage { background: var(--sage); }
+  .timeline-dot.navy { box-shadow: 0 0 0 2px var(--navy); background: var(--navy); }
+  .timeline-date { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .timeline-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .timeline-desc { font-size: 13px; color: var(--slate); line-height: 1.65; }
+
+  .months-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 36px; }
+  .month-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--card-shadow); overflow: hidden; }
+  .month-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #F0F4F8; }
+  .month-title { font-weight: 700; font-size: 14px; color: var(--navy); }
+  .month-phase { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; letter-spacing: 0.5px; }
+  .phase-setup { background: var(--sage-pale); color: var(--sage); }
+  .phase-grow { background: var(--gold-pale); color: #9A7A2E; }
+  .phase-build { background: #EEF2FF; color: #6366F1; }
+  .phase-prepare { background: var(--coral-pale); color: var(--coral); }
+  .month-body { padding: 16px 20px 18px; }
+  .month-action { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #F7F9FC; }
+  .month-action:last-child { border-bottom: none; }
+  .action-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .icon-green { background: var(--sage-pale); }
+  .icon-gold { background: var(--gold-pale); }
+  .icon-coral { background: var(--coral-pale); }
+  .icon-blue { background: #EEF2FF; }
+  .action-title { font-size: 13.5px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+  .action-why { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .action-why strong { color: var(--slate); font-weight: 600; }
+
+  .goals-table { background: var(--white); border-radius: var(--radius); box-shadow: var(--card-shadow); overflow: hidden; margin-bottom: 28px; }
+  .goals-table table { width: 100%; border-collapse: collapse; }
+  .goals-table th { background: var(--navy); color: rgba(255,255,255,0.75); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 12px 18px; text-align: left; }
+  .goals-table td { padding: 13px 18px; font-size: 13px; border-bottom: 1px solid #F0F4F8; vertical-align: top; }
+  .goals-table tr:last-child td { border-bottom: none; }
+  .goals-table tr:hover td { background: #FAFBFD; }
+  .goal-name { font-weight: 600; color: var(--navy); }
+  .goal-tag { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-top: 4px; }
+  .tag-short { background: var(--coral-pale); color: var(--coral); }
+  .tag-med { background: var(--gold-pale); color: #9A7A2E; }
+  .tag-long { background: var(--sage-pale); color: var(--sage); }
+  .amount-chip { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--navy); }
+  .progress-track { height: 6px; border-radius: 3px; background: #EEF2F7; overflow: hidden; width: 120px; margin-top: 6px; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+
+  .avoid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  .avoid-card { background: #FFF8F7; border: 1px solid #F5D0C8; border-radius: var(--radius); padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start; }
+  .avoid-icon { font-size: 22px; margin-top: 1px; }
+  .avoid-title { font-weight: 700; font-size: 13.5px; color: var(--coral); margin-bottom: 4px; }
+  .avoid-desc { font-size: 12.5px; color: var(--slate); line-height: 1.6; }
+
+  /* KNOWLEDGE HUB */
+  .knowledge-section-label { font-size: 13px; font-weight: 700; color: var(--navy); letter-spacing: 0.5px; text-transform: uppercase; margin: 28px 0 6px; }
+  .knowledge-section-sub { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; }
+
+  .app-category { margin-bottom: 32px; }
+  .app-category-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); border-bottom: 1px solid #E8EDF2; padding-bottom: 8px; margin-bottom: 16px; }
+  .knowledge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 8px; }
+  .knowledge-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 8px; }
+  .app-card { background: var(--white); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--card-shadow); display: flex; flex-direction: column; gap: 10px; }
+  .app-header { display: flex; align-items: center; gap: 12px; }
+  .app-emoji { font-size: 26px; }
+  .app-name { font-weight: 700; font-size: 14.5px; color: var(--navy); }
+  .app-type { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .app-desc { font-size: 12.5px; color: var(--slate); line-height: 1.6; }
+  .app-rating { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); }
+  .rating-badge { font-size: 10.5px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+  .rb-best { background: var(--sage-pale); color: var(--sage); }
+  .rb-good { background: var(--gold-pale); color: #9A7A2E; }
+  .rb-skip { background: var(--coral-pale); color: var(--coral); }
+  .rb-official { background: #EEF2FF; color: #5B6EF5; }
+  .app-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+  .app-tag { font-size: 10px; padding: 3px 9px; background: var(--sage-pale); color: var(--sage); border-radius: 10px; font-weight: 600; }
+  .app-tag.gold { background: var(--gold-pale); color: #9A7A2E; }
+  .app-tag.navy { background: #EEF2FF; color: #5B6EF5; }
+  .app-tag.red { background: var(--coral-pale); color: var(--coral); }
+
+  .concept-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--card-shadow); margin-bottom: 12px; overflow: hidden; }
+  .concept-header { display: flex; align-items: center; gap: 14px; padding: 15px 20px; cursor: pointer; user-select: none; }
+  .concept-icon { font-size: 20px; }
+  .concept-title { font-weight: 600; font-size: 14px; color: var(--navy); flex: 1; }
+  .concept-chevron { color: var(--muted); font-size: 16px; transition: transform 0.2s; }
+  .concept-body { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.2s; font-size: 13px; color: var(--slate); line-height: 1.75; }
+  .concept-body.open { max-height: 600px; padding: 0 20px 18px; }
+  .concept-header.open .concept-chevron { transform: rotate(180deg); }
+  .concept-body ul { padding-left: 18px; margin-top: 8px; }
+  .concept-body ul li { margin-bottom: 5px; }
+  .concept-highlight { background: var(--gold-pale); border-radius: 6px; padding: 8px 12px; margin-top: 10px; font-size: 12.5px; color: #7A5A1E; font-weight: 500; }
+
+  .milestone-list { background: var(--white); border-radius: var(--radius); box-shadow: var(--card-shadow); overflow: hidden; margin-bottom: 28px; }
+  .milestone-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px 20px; border-bottom: 1px solid #F0F4F8; }
+  .milestone-item:last-child { border-bottom: none; }
+  .milestone-num { width: 28px; height: 28px; border-radius: 50%; background: var(--navy); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .milestone-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--sage); flex-shrink: 0; margin-top: 6px; }
+  .milestone-text { font-size: 13.5px; color: var(--navy); flex: 1; line-height: 1.5; font-weight: 600; }
+  .milestone-sub { font-size: 12px; color: var(--muted); margin-top: 3px; font-weight: 400; line-height: 1.55; }
+
+  @media (max-width: 900px) {
+    .content { padding: 24px 20px 40px; }
+    .header { padding: 28px 20px 24px; }
+    .tabs-bar { padding: 0 20px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .months-grid, .knowledge-grid, .knowledge-grid-2, .avoid-grid { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
-  <div class="dashboard">
-    <div class="shell">
-      <header>
-        <div class="header-row">
-          <div>
-            <p class="kicker">Bangalore | 26 | Wedding + wealth plan | 2026-2031</p>
-            <h1>Financial Planning Dashboard<span class="person">Pratyasha Sahu</span></h1>
-            <p class="header-meta">A five-year command center for protecting short-term goals, increasing SIPs gradually, and keeping the plan simple enough to actually follow.</p>
-          </div>
-          <div class="score-card">
-            <div class="score-label">Current Plan Mode</div>
-            <div class="score">Moderate</div>
-            <div class="score-note">Conservative for wedding money. Equity-focused only for 7+ year goals.</div>
-          </div>
-        </div>
-        <nav class="tabs" aria-label="Dashboard sections">
-          <button class="tab active" data-view="overview">Overview</button>
-          <button class="tab" data-view="first-month">30 Days</button>
-          <button class="tab" data-view="quarter">90 Days</button>
-          <button class="tab" data-view="year-one">1 Year</button>
-          <button class="tab" data-view="five-year">5-Year Path</button>
-          <button class="tab" data-view="rules">Rules</button>
-        </nav>
-      </header>
 
-      <main>
-        <section class="view active" id="overview">
-          <div class="grid track-grid">
-            <article class="card track-card" style="--accent: var(--green); --value: 80%;">
-              <div class="track-icon">S</div>
-              <h2>Safety Base</h2>
-              <div class="track-value">80%</div>
-              <div class="progress"><span></span></div>
-              <p class="track-meta">₹5L liquid exists. Label ₹3.5L-₹4L as emergency fund before optimizing returns.</p>
-            </article>
-            <article class="card track-card" style="--accent: var(--coral); --value: 25%;">
-              <div class="track-icon">W</div>
-              <h2>Wedding Fund</h2>
-              <div class="track-value">25%</div>
-              <div class="progress"><span></span></div>
-              <p class="track-meta">Target personal contribution ₹5L-₹6L in 2-3 years. Use ₹15k/month safe savings.</p>
-            </article>
-            <article class="card track-card" style="--accent: var(--violet); --value: 40%;">
-              <div class="track-icon">I</div>
-              <h2>SIP Growth</h2>
-              <div class="track-value">40%</div>
-              <div class="progress"><span></span></div>
-              <p class="track-meta">Current SIP ₹6k. Move to ₹10k, then ₹13k, then ₹15k over one year.</p>
-            </article>
-            <article class="card track-card" style="--accent: var(--cyan); --value: 35%;">
-              <div class="track-icon">H</div>
-              <h2>House + Retirement</h2>
-              <div class="track-value">35%</div>
-              <div class="progress"><span></span></div>
-              <p class="track-meta">EPF continues at ₹4k/month. House plan becomes serious after wedding fund is complete.</p>
-            </article>
-          </div>
+<div class="header">
+  <div class="header-label">Bangalore · Age 26 · 5-Year Financial Roadmap</div>
+  <h1>Pratyasha Sahu's Financial Roadmap 🌱</h1>
+  <p>A simple, step-by-step plan for Pratyasha — wedding fund, safety net, and growing wealth without stress. You already have a head start with ₹5L in savings.</p>
+  <div class="header-badges">
+    <span class="badge">📍 Bangalore</span>
+    <span class="badge">💼 Consultant</span>
+    <span class="badge">💰 ₹92k/mo (post-promotion)</span>
+    <span class="badge">🎯 Wedding in 2–3 years</span>
+    <span class="badge">💚 ₹5L already saved</span>
+  </div>
+</div>
 
-          <div class="grid two-col">
-            <article class="card" style="--accent: var(--green);">
-              <div class="card-head"><h2 class="card-title">Today's Priority Tasks</h2><span class="dot"></span></div>
-              <div class="card-body">
-                <div class="task"><span class="box"></span><div><strong>Separate emergency and wedding money</strong><span>Keep ₹3.5L-₹4L untouched. Move ₹1L-₹1.5L into a wedding bucket.</span></div><span class="tag">high</span></div>
-                <div class="task"><span class="box"></span><div><strong>Check current SIP details</strong><span>Confirm exact fund names, Direct vs Regular, Growth vs IDCW.</span></div><span class="tag">high</span></div>
-                <div class="task"><span class="box"></span><div><strong>Create ₹15k wedding transfer</strong><span>Use bank RD/FD or liquid fund. Do not use equity for this goal.</span></div><span class="tag">high</span></div>
-                <div class="task"><span class="box"></span><div><strong>Raise SIP only gradually</strong><span>Move from ₹6k to ₹10k after setup, not from fear or excitement.</span></div><span class="tag">medium</span></div>
-              </div>
-            </article>
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('snapshot', event)"><span class="tab-icon">📊</span> Snapshot</button>
+  <button class="tab-btn" onclick="switchTab('monthly', event)"><span class="tab-icon">📅</span> Monthly Goals</button>
+  <button class="tab-btn" onclick="switchTab('goals', event)"><span class="tab-icon">🎯</span> Goals Tracker</button>
+  <button class="tab-btn" onclick="switchTab('checklist', event)"><span class="tab-icon">📋</span> 30-Day Milestones</button>
+  <button class="tab-btn" onclick="switchTab('knowledge', event)"><span class="tab-icon">💡</span> Knowledge Hub</button>
+</div>
 
-            <article class="card" style="--accent: var(--violet);">
-              <div class="card-head"><h2 class="card-title">Weekly Goals</h2><span class="dot"></span></div>
-              <div class="card-body">
-                <div class="goal-list">
-                  <div class="goal" style="--accent: var(--green);"><h3>Safety Base</h3><p>Confirm salary account sweep FD or FD setup. Do not chase high yield for emergency money.</p></div>
-                  <div class="goal" style="--accent: var(--coral);"><h3>Wedding Track</h3><p>Decide exact monthly transfer date. Treat it like rent: automatic and non-negotiable.</p></div>
-                  <div class="goal" style="--accent: var(--violet);"><h3>Investment Track</h3><p>Use Direct Growth mutual funds through MF Central, Kuvera, Groww, or AMC websites.</p></div>
-                  <div class="goal" style="--accent: var(--cyan);"><h3>Insurance Track</h3><p>Review employer health cover. Consider personal health policy within 6-12 months.</p></div>
-                </div>
-              </div>
-            </article>
-          </div>
-        </section>
+<div class="content">
 
-        <section class="view" id="first-month">
-          <div class="timeline">
-            <div class="milestone"><div class="when">Day 1-7</div><div><h3>Clean money map</h3><p>Write down actual post-promotion take-home, rent, food, cabs, shopping, SIP, and EPF. Target monthly spending ceiling: ₹60k-₹62k.</p></div></div>
-            <div class="milestone"><div class="when">Day 8-14</div><div><h3>Emergency fund lockbox</h3><p>Keep ₹3.5L-₹4L in savings plus sweep FD or bank FD. This money is not for investing, shopping, or wedding outfits.</p></div></div>
-            <div class="milestone"><div class="when">Day 15-21</div><div><h3>Wedding bucket</h3><p>Move ₹1L-₹1.5L as seed money and start ₹15k/month RD, FD ladder, or liquid fund transfer.</p></div></div>
-            <div class="milestone"><div class="when">Day 22-30</div><div><h3>SIP audit</h3><p>Confirm existing ₹6k SIP fund names. If they are Regular or unsuitable sector funds, switch future SIPs to simple Direct Growth funds.</p></div></div>
-          </div>
-        </section>
+<!-- ======= SNAPSHOT ======= -->
+<div id="tab-snapshot" class="tab-panel active">
 
-        <section class="view" id="quarter">
-          <div class="split">
-            <article class="card" style="--accent: var(--violet);">
-              <div class="card-head"><h2 class="card-title">90-Day Targets</h2><span class="dot"></span></div>
-              <div class="card-body">
-                <div class="task"><span class="box"></span><div><strong>Increase SIP to ₹10k</strong><span>Preferred split: ₹7k Nifty 50 or Nifty 500 index fund, ₹3k flexi-cap.</span></div><span class="tag">SIP</span></div>
-                <div class="task"><span class="box"></span><div><strong>Keep wedding saving at ₹15k</strong><span>This should run separately from SIP and EPF.</span></div><span class="tag">safe</span></div>
-                <div class="task"><span class="box"></span><div><strong>Review spending drift</strong><span>If lifestyle spending crosses ₹62k, pause SIP increase and fix expenses first.</span></div><span class="tag">control</span></div>
-              </div>
-            </article>
-            <article class="card" style="--accent: var(--amber);">
-              <div class="card-head"><h2 class="card-title">Monthly Allocation</h2><span class="dot"></span></div>
-              <div class="card-body">
-                <table>
-                  <thead><tr><th>Bucket</th><th>Amount</th><th>Where</th></tr></thead>
-                  <tbody>
-                    <tr><td>Expenses</td><td>₹58k-₹60k</td><td>Salary bank</td></tr>
-                    <tr><td>Wedding</td><td>₹15k</td><td>RD / FD / liquid fund</td></tr>
-                    <tr><td>SIP</td><td>₹10k</td><td>Direct Growth mutual funds</td></tr>
-                    <tr><td>EPF</td><td>₹4k</td><td>Employer EPF</td></tr>
-                    <tr><td>Buffer</td><td>₹3k-₹5k</td><td>Travel / personal / misc.</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section class="view" id="year-one">
-          <div class="timeline">
-            <div class="milestone"><div class="when">6 Months</div><div><h3>SIP to ₹13k</h3><p>If she is comfortable and spending is controlled, increase SIP to ₹13k. Keep emergency fund untouched and wedding savings safe.</p></div></div>
-            <div class="milestone"><div class="when">9 Months</div><div><h3>Insurance check</h3><p>Employer health insurance is useful but job-linked. Compare personal health cover options, target around ₹10L cover if affordable.</p></div></div>
-            <div class="milestone"><div class="when">12 Months</div><div><h3>SIP to ₹15k</h3><p>Target split: ₹10k index fund plus ₹5k flexi-cap or one broad Nifty 500 index fund for maximum simplicity.</p></div></div>
-          </div>
-        </section>
-
-        <section class="view" id="five-year">
-          <div class="timeline">
-            <div class="milestone"><div class="when">Year 2</div><div><h3>Wedding fund nearly ready</h3><p>Expected bucket: around ₹4.6L-₹5L with seed money and monthly savings. If wedding is within 12 months, keep all wedding money out of equity.</p></div></div>
-            <div class="milestone"><div class="when">Year 3</div><div><h3>Wedding complete, reset cash flow</h3><p>After wedding expenses, rebuild emergency fund if touched. Redirect the ₹15k wedding transfer into SIP or house down-payment savings.</p></div></div>
-            <div class="milestone"><div class="when">Year 4</div><div><h3>House fund starts seriously</h3><p>If buying is still 5+ years away, use more equity. If buying is closer, use safer FD/debt allocation.</p></div></div>
-            <div class="milestone"><div class="when">Year 5</div><div><h3>Wealth mode</h3><p>Target ₹30k-₹40k/month total long-term investing if income has grown. Keep the system boring, automatic, and reviewed twice a year.</p></div></div>
-          </div>
-        </section>
-
-        <section class="view" id="rules">
-          <div class="split">
-            <article class="card" style="--accent: var(--coral);">
-              <div class="card-head"><h2 class="card-title">Do Not Buy</h2><span class="dot"></span></div>
-              <div class="card-body">
-                <div class="rule">Avoid ULIPs, endowment plans, F&O, crypto, sector funds, stock tips, and investing wedding money in equity. Limit Shriram or other NBFC FD exposure because it is not the same safety category as a bank FD.</div>
-              </div>
-            </article>
-            <article class="card" style="--accent: var(--green);">
-              <div class="card-head"><h2 class="card-title">Market Fall Rule</h2><span class="dot"></span></div>
-              <div class="card-body">
-                <div class="rule" style="border-left-color: var(--green); background: rgba(88, 214, 176, 0.08); color: #d6fff2;">If equity mutual funds fall 20-30%, do not sell long-term SIPs. Continue SIPs. The protection happens before the fall by keeping 0-3 year money outside equity.</div>
-                <p class="small">Educational planning only. Confirm tax and product suitability with a qualified advisor or CA before acting.</p>
-              </div>
-            </article>
-          </div>
-        </section>
-      </main>
+  <div class="headstart-banner">
+    <div class="hs-icon">🏆</div>
+    <div>
+      <div class="hs-title">You're already ahead — here's why that matters</div>
+      <div class="hs-body">Most 26-year-olds start their wedding planning with ₹0 saved. <strong>You have ₹5L in cash right now.</strong> This changes the entire plan in your favour. Your emergency fund is already funded, your wedding seed money is already sitting there, and you only need your RD to top it up — not build from scratch. This is a significant advantage. The plan below makes it work harder for you.</div>
     </div>
   </div>
 
-  <script>
-    const tabs = document.querySelectorAll(".tab");
-    const views = document.querySelectorAll(".view");
+  <div class="stats-row">
+    <div class="stat-card green">
+      <div class="stat-label">Monthly Take-Home</div>
+      <div class="stat-value">₹92k</div>
+      <div class="stat-sub">Post-promotion estimate</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-label">Cash Savings Today</div>
+      <div class="stat-value">₹5L</div>
+      <div class="stat-sub">Already split: ₹3.5L emergency + ₹1.5L wedding</div>
+    </div>
+    <div class="stat-card coral">
+      <div class="stat-label">Monthly Expenses</div>
+      <div class="stat-value">₹60k</div>
+      <div class="stat-sub">Keep this as the ceiling</div>
+    </div>
+    <div class="stat-card navy">
+      <div class="stat-label">Current Investing</div>
+      <div class="stat-value">₹10k</div>
+      <div class="stat-sub">₹6k SIP + ₹4k EPF</div>
+    </div>
+  </div>
 
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.view;
-        tabs.forEach((item) => item.classList.toggle("active", item === tab));
-        views.forEach((view) => view.classList.toggle("active", view.id === target));
-      });
-    });
-  </script>
+  <div class="section-heading">Wedding Fund Math — You're Closer Than You Think</div>
+  <div class="section-sub">Because you already have ₹1.5L as a lump sum seed, your wedding fund builds faster than starting from scratch.</div>
+
+  <div class="wedding-math">
+    <div class="wm-title">💍 Projected Wedding Corpus by Mid-2028 (Month 24)</div>
+    <div class="wm-row">
+      <span class="wm-label">₹1.5L wedding seed → 2-year FD at ~7%</span>
+      <span class="wm-amount">≈ ₹1,72,500</span>
+    </div>
+    <div class="wm-row">
+      <span class="wm-label">₹15k/month RD for 24 months + interest</span>
+      <span class="wm-amount">≈ ₹3,87,000</span>
+    </div>
+    <div class="wm-row">
+      <span class="wm-label">May/June annual bonus (30% of ~₹1L, conservative)</span>
+      <span class="wm-amount">≈ ₹60,000</span>
+    </div>
+    <div class="wm-row">
+      <span class="wm-label">Total projected personal wedding corpus</span>
+      <span class="wm-amount">≈ ₹6,20,000</span>
+    </div>
+    <div class="wm-note">⚠️ Wedding money stays in FD/RD only — never in equity or stocks. This is 2-year money. The ₹15–20L wedding target includes family contributions. Your ₹6.2L is your personal contribution — fully funded through this plan.</div>
+  </div>
+
+  <div class="section-heading">Target Monthly Allocation (Post-Promotion)</div>
+  <div class="section-sub">The promotion raise of ~₹20k/month is the engine. Here's exactly where it goes.</div>
+
+  <div class="allocation-card">
+    <div class="alloc-title">₹92,000 per month — how to split it</div>
+    <div class="alloc-bar">
+      <div class="alloc-seg" style="width:64%; background:#7B9E87;">64% · ₹59k</div>
+      <div class="alloc-seg" style="width:16%; background:#C9A84C;">16% · ₹15k</div>
+      <div class="alloc-seg" style="width:11%; background:#5B6EF5;">11% · ₹10k</div>
+      <div class="alloc-seg" style="width:4%; background:#1E2B3A;">4% · ₹4k</div>
+      <div class="alloc-seg" style="width:5%; background:#D4735E;">5% · ₹4k</div>
+    </div>
+    <div class="alloc-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#7B9E87;"></div>Core expenses (rent, food, cabs, personal) — ₹59k ceiling</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#C9A84C;"></div>Wedding RD — ₹15k (stops after wedding)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5B6EF5;"></div>Long-term SIP (stepping up) — ₹10k → ₹15k</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#1E2B3A;"></div>EPF (auto-deducted from CTC) — ₹4k</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#D4735E;"></div>Buffer (travel, gifts, emergencies) — ₹4k</div>
+    </div>
+  </div>
+
+  <div class="rule-box">
+    <div class="rule-icon">⚡</div>
+    <div>
+      <div class="rule-title">The one rule that matters more than any fund selection</div>
+      <div class="rule-desc">If equity mutual funds drop 20–30%, <strong style="color:var(--gold-light)">do not sell</strong>. Indian markets have recovered from every single crash in history. Your SIP keeps buying more units at lower prices — like a sale on your future wealth. The only money that needs protection from market falls is money you need within 3 years. That's your RD and FD. Your SIP is untouchable.</div>
+    </div>
+  </div>
+
+  <div class="section-heading">5-Year Timeline</div>
+  <div class="section-sub">Because you already have ₹5L, the first milestone is already almost done — a huge advantage.</div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot sage"></div>
+      <div class="timeline-date">Month 1 · May 2026</div>
+      <div class="timeline-title">Foundation — almost already done ✅</div>
+      <div class="timeline-desc">Your ₹5L is the starting advantage. Split it today: ₹3.5L → emergency FD, ₹1.5L → 2-year wedding FD. Raise SIP from ₹6k to ₹10k. Start ₹15k/month RD. Setup complete in week 1.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot gold"></div>
+      <div class="timeline-date">Month 3–12 · 2026</div>
+      <div class="timeline-title">Grow the SIP ladder steadily</div>
+      <div class="timeline-desc">Step SIP from ₹10k → ₹13k (month 6) → ₹15k (month 12). Keep expenses under ₹62k. Buy personal health insurance. Check that wedding RD is automating.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot gold"></div>
+      <div class="timeline-date">Year 2 · 2027</div>
+      <div class="timeline-title">Wedding fund is nearly ready</div>
+      <div class="timeline-desc">By end of 2027 your wedding corpus hits ~₹5L+. The FD you started with ₹1.5L is maturing. Start moving everything to a short-term FD or liquid fund — zero market risk. SIPs keep running.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot coral"></div>
+      <div class="timeline-date">Year 3 · 2028</div>
+      <div class="timeline-title">Wedding → Reset → Wealth mode begins</div>
+      <div class="timeline-desc">After the wedding, rebuild emergency fund first. Then redirect the entire ₹15k wedding RD into long-term SIPs. You now have ₹25–30k/month in equity — this is where compounding starts working seriously.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot navy"></div>
+      <div class="timeline-date">Year 4–5 · 2029–2030</div>
+      <div class="timeline-title">Wealth-building mode — full speed</div>
+      <div class="timeline-desc">Target ₹30–40k/month total investing. Start evaluating house down payment. Your equity corpus from 4 years of SIPs should be ₹8–12L+. Family situation may have changed — revisit the plan with a SEBI-registered advisor.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ======= MONTHLY GOALS ======= -->
+<div id="tab-monthly" class="tab-panel">
+  <div class="section-heading">Month-by-Month Action Plan</div>
+  <div class="section-sub">Next 24 months — what to do, and exactly why. Updated for your ₹5L head start.</div>
+
+  <div class="months-grid">
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Month 1 — May 2026</div><div class="month-phase phase-setup">Setup</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-green">🏦</div>
+          <div class="action-content">
+            <div class="action-title">Split your ₹5L into 2 FDs — today</div>
+            <div class="action-why"><strong>Do this:</strong> Open two FDs at your bank. FD 1: ₹3.5L — label it "Emergency — Do Not Touch." FD 2: ₹1.5L — label it "Wedding Seed — 2 year lock." Both earn ~7% vs 3–4% in savings.<br><strong>Why:</strong> Your savings account is eroding your money with low interest. An FD immediately earns more. Separating them removes the temptation to spend the wedding money on shopping or travel.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-gold">📋</div>
+          <div class="action-content">
+            <div class="action-title">Audit your current ₹6k SIP</div>
+            <div class="action-why"><strong>Do this:</strong> Open your MF app → find your fund → check if it says "Direct" and "Growth" in the plan type. Screenshot it.<br><strong>Why:</strong> If it says "Regular," you're paying a commission every year. Switching to Direct could save ₹8,000–15,000 over 5 years on just ₹6k/month SIP alone.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-blue">🔗</div>
+          <div class="action-content">
+            <div class="action-title">Register on MF Central</div>
+            <div class="action-why"><strong>Do this:</strong> mfcentral.com → login with PAN + Aadhaar OTP → see your complete MF portfolio.<br><strong>Why:</strong> If you've ever had SIPs in multiple banks or apps, you may have forgotten funds. MF Central shows everything in one place — it's your financial x-ray.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Month 2 — June 2026</div><div class="month-phase phase-setup">Setup</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-gold">💍</div>
+          <div class="action-content">
+            <div class="action-title">Start ₹15k/month Wedding RD (automate)</div>
+            <div class="action-why"><strong>Do this:</strong> Bank app → Recurring Deposit → ₹15,000/month → set auto-debit on your salary credit date. 24-month tenure.<br><strong>Why:</strong> Automation removes willpower from the equation. In 24 months this builds ₹3.87L. Combined with your ₹1.5L FD seed, you'll have ~₹5.6L+ for the wedding — without ever thinking about it.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-green">📈</div>
+          <div class="action-content">
+            <div class="action-title">Raise SIP from ₹6k → ₹10k</div>
+            <div class="action-why"><strong>Do this:</strong> On Kuvera or Groww, modify your existing SIP amount. Add ₹4k to the same index fund (Nifty 50 or Nifty 500).<br><strong>Why:</strong> The promotion gave you ~₹20k more per month. If you don't tell this money where to go, it will quietly go into restaurants and Amazon. The SIP increase captures it before it disappears.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-gold">💰</div>
+          <div class="action-content">
+            <div class="action-title">Plan your May/June annual bonus</div>
+            <div class="action-why"><strong>Do this:</strong> When the bonus arrives (likely ₹80k–1.5L), decide in advance: 50% into wedding FD top-up, 30% for travel or personal spending (you deserve it!), 20% into a lump-sum SIP investment.<br><strong>Why:</strong> Bonuses are the most dangerous money — they feel "extra" so we spend them entirely. A pre-decided split turns a windfall into a wealth-building event.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Month 3–4 — Jul–Aug 2026</div><div class="month-phase phase-grow">Growing</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-green">🌿</div>
+          <div class="action-content">
+            <div class="action-title">3-month expense check</div>
+            <div class="action-why"><strong>Do this:</strong> Open your bank statement for May–July. Total up all UPI + card spends. Did it stay under ₹60k/month?<br><strong>Why:</strong> Lifestyle creep after a promotion is the #1 wealth killer for young professionals in India. The first 3 months after a raise are critical — small upgrades in every category compound silently to ₹10–15k extra spending per month.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-blue">🏥</div>
+          <div class="action-content">
+            <div class="action-title">Start shopping for personal health insurance</div>
+            <div class="action-why"><strong>Do this:</strong> Go to Ditto (ditto.in) — it's free, no sales pressure, a real human explains what you need. Get a ₹5–10L individual policy. Annual premium ≈ ₹8,000–13,000 at age 26.<br><strong>Why:</strong> Employer health insurance ends the day you resign or are let go. At 26 your premium is cheap and you're healthy — this is the perfect time. Waiting till 30+ or after a health event makes it expensive or denied.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Month 6 — Oct 2026</div><div class="month-phase phase-grow">Growing</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-green">📈</div>
+          <div class="action-content">
+            <div class="action-title">Raise SIP from ₹10k → ₹13k</div>
+            <div class="action-why"><strong>Do this:</strong> If the past 6 months have felt financially comfortable (expenses under ₹62k, no stress), add ₹3k more to your SIP. You can optionally open a second SIP in a flexi-cap fund.<br><strong>Why:</strong> Step-ups are the most powerful habit in mutual fund investing. Adding ₹3k/month more at this age, compounded at 11% for 20 years, adds roughly ₹25L extra to your retirement corpus. That's the power of one restaurant meal per month redirected.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-gold">📊</div>
+          <div class="action-content">
+            <div class="action-title">6-month net worth snapshot</div>
+            <div class="action-why"><strong>Do this:</strong> Write down: Emergency FD (₹3.5L) + Wedding corpus (₹1.5L FD + 6×₹15k RD = ~₹2.4L) + SIP value + EPF balance. Total = your net worth.<br><strong>Why:</strong> Tracking net worth every 6 months is more motivating than tracking spending. You see the number grow and it reinforces the right behavior. Keep this in a notes app.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Month 9–12 — Jan–Apr 2027</div><div class="month-phase phase-grow">Growing</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-green">🎯</div>
+          <div class="action-content">
+            <div class="action-title">Reach ₹15k SIP — Year 1 target</div>
+            <div class="action-why"><strong>Do this:</strong> ₹10k in Nifty 50 Index Fund (Direct, Growth) + ₹5k in a Flexi-Cap Fund (Direct, Growth). Both on Kuvera or Groww.<br><strong>Why:</strong> Two funds. That's enough. Index fund = boring core that beats 80% of active funds. Flexi-cap = a fund manager picks the best stocks across company sizes. Together they cover all of India's listed market without complexity.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-gold">💍</div>
+          <div class="action-content">
+            <div class="action-title">Wedding fund check-in</div>
+            <div class="action-why"><strong>Do this:</strong> By month 12 you should have: ₹1.72L (FD maturity growing) + ₹1.8L (12 months RD) = ~₹3.52L accumulated. Check the numbers.<br><strong>Why:</strong> You're already 57% of the way to your ₹6.2L target with 12 months still to go. This is the proof the plan is working.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-coral">🧮</div>
+          <div class="action-content">
+            <div class="action-title">January: Tax-saving check with CA</div>
+            <div class="action-why"><strong>Do this:</strong> Call your CA in January. Ask: old regime vs new regime? Should I do ELSS SIP? What's my projected tax for FY26-27?<br><strong>Why:</strong> Section 80C allows ₹1.5L deduction under old regime. Your EPF already contributes. ELSS SIP can cover the remaining gap and give equity returns. This decision, made right, can save ₹15,000–45,000 in taxes per year.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Year 2 — All of 2027</div><div class="month-phase phase-build">Building</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-gold">💍</div>
+          <div class="action-content">
+            <div class="action-title">Wedding corpus almost complete</div>
+            <div class="action-why"><strong>Do this:</strong> By Dec 2027 your wedding total = ₹1.72L (FD) + ₹3.6L (RD 24 months) + ₹27k interest + bonus contribution = ~₹6L+. Stop the RD when it matures. Move everything into a 6-month FD while the wedding is planned.<br><strong>Why:</strong> Never leave wedding money sitting in equity or liquid funds in the 6 months before the event. One bad market month could cut it by ₹60–90k. An FD guarantees the number you need.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-green">📈</div>
+          <div class="action-content">
+            <div class="action-title">Long-term SIPs — keep running no matter what</div>
+            <div class="action-why"><strong>Do this:</strong> Even if markets are down 30%, your SIPs continue. Set a calendar reminder every January to review (not react). That's it.<br><strong>Why:</strong> 2027 may have market volatility. The investors who sit still during volatility retire wealthy. The ones who pause SIPs or switch funds frequently underperform savings accounts.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-blue">🏠</div>
+          <div class="action-content">
+            <div class="action-title">Begin thinking about home purchase timeline</div>
+            <div class="action-why"><strong>Do this:</strong> No action yet — just answer: is the home purchase likely in 3 years, 5 years, or 7+ years? This decides whether your post-wedding savings go into equity or debt.<br><strong>Why:</strong> If the home is 7+ years away, equity SIPs are the right vehicle. If it's 3–4 years, you'll need a safer allocation. Knowing the timeline now avoids a rushed decision later.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Post-Wedding — 2028</div><div class="month-phase phase-prepare">Reset</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-green">🔄</div>
+          <div class="action-content">
+            <div class="action-title">Rebuild emergency fund if dipped</div>
+            <div class="action-why"><strong>Do this:</strong> Check emergency FD. If it was touched for wedding expenses, rebuild to ₹4L (6 months of ₹60–65k expenses) before any other investing.<br><strong>Why:</strong> Emergency fund is your financial immune system. Before wealth-building, the safety net must be restored. This protects you from taking on debt for any surprise expense.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-gold">🚀</div>
+          <div class="action-content">
+            <div class="action-title">The biggest wealth jump: redirect ₹15k RD into SIP</div>
+            <div class="action-why"><strong>Do this:</strong> As soon as the wedding RD stops, redirect that exact ₹15,000 into your long-term SIP. Total SIP is now ₹30k/month.<br><strong>Why:</strong> ₹30k/month at 11% CAGR for 17 years = approximately ₹1.8 crore. This one redirection, done at 28–29, is the most important financial decision of the next decade. Don't let the ₹15k get absorbed into lifestyle.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="month-card">
+      <div class="month-header"><div class="month-title">Years 4–5 — 2029–2030</div><div class="month-phase phase-prepare">Wealth Mode</div></div>
+      <div class="month-body">
+        <div class="month-action">
+          <div class="action-icon icon-green">💎</div>
+          <div class="action-content">
+            <div class="action-title">Target ₹30–40k/month total investing</div>
+            <div class="action-why"><strong>Do this:</strong> By now income has likely grown. SIP + EPF should be ₹30–40k/month. Evaluate adding NPS (National Pension System) for additional tax benefit under 80CCD(1B) — extra ₹50k deduction beyond 80C.<br><strong>Why:</strong> NPS gives an additional ₹50,000 tax deduction every year, completely separate from the ₹1.5L 80C limit. At this income level, that's meaningful tax saving with locked-in retirement corpus.</div>
+          </div>
+        </div>
+        <div class="month-action">
+          <div class="action-icon icon-blue">🏠</div>
+          <div class="action-content">
+            <div class="action-title">Seriously evaluate home purchase</div>
+            <div class="action-why"><strong>Do this:</strong> By 2029 your equity SIP corpus should be ₹10–16L. Evaluate: is this enough for a down payment? What's your loan eligibility? Compare EMI vs rent in Bangalore.<br><strong>Why:</strong> Bangalore property prices are high. A ₹70L flat needs ₹14L+ down payment plus stamp duty and registration. Knowing your corpus now means you buy when ready — not under pressure.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======= GOALS TRACKER ======= -->
+<div id="tab-goals" class="tab-panel">
+  <div class="section-heading">Goals Tracker</div>
+  <div class="section-sub">Each goal has a different instrument because your timeline is more important than return chasing.</div>
+
+  <div class="goals-table">
+    <table>
+      <thead>
+        <tr><th>Goal</th><th>Timeline</th><th>Instrument</th><th>Monthly Action</th><th>Target</th><th>Progress</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="goal-name">🛡️ Emergency Fund</div><div class="goal-tag tag-short">Always Ready</div></td>
+          <td style="font-size:12px;color:var(--muted);">Permanent — never invest this</td>
+          <td style="font-size:12.5px;">Bank FD (sweep or fixed)</td>
+          <td style="font-size:12.5px;">Keep ₹3.5L in FD. Do not touch.</td>
+          <td><span class="amount-chip">₹3.5–4L</span></td>
+          <td><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">₹3.5L of ₹4L · Nearly done</div><div class="progress-track"><div class="progress-fill" style="width:87%;background:var(--sage);"></div></div></td>
+        </tr>
+        <tr>
+          <td><div class="goal-name">💍 Wedding Fund</div><div class="goal-tag tag-short">2–3 Years</div></td>
+          <td style="font-size:12px;color:var(--muted);">2027–2028</td>
+          <td style="font-size:12.5px;">₹1.5L FD (seed) + ₹15k/month RD</td>
+          <td style="font-size:12.5px;">Automate RD. FD already open.</td>
+          <td><span class="amount-chip">₹6–6.5L</span></td>
+          <td><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">₹1.5L seed placed · RD starting</div><div class="progress-track"><div class="progress-fill" style="width:23%;background:var(--gold);"></div></div></td>
+        </tr>
+        <tr>
+          <td><div class="goal-name">🌱 Long-term Wealth</div><div class="goal-tag tag-long">20+ Years</div></td>
+          <td style="font-size:12px;color:var(--muted);">Retirement / House</td>
+          <td style="font-size:12.5px;">EPF + Nifty 50 Index + Flexi-Cap SIP</td>
+          <td style="font-size:12.5px;">₹4k EPF + step up SIP to ₹15k by month 12</td>
+          <td><span class="amount-chip">₹1–2Cr</span></td>
+          <td><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">₹6k SIP running · stepping up</div><div class="progress-track"><div class="progress-fill" style="width:5%;background:#5B6EF5;"></div></div></td>
+        </tr>
+        <tr>
+          <td><div class="goal-name">🏠 House Down Payment</div><div class="goal-tag tag-med">7+ Years</div></td>
+          <td style="font-size:12px;color:var(--muted);">2030 onwards</td>
+          <td style="font-size:12.5px;">Redirect post-wedding ₹15k to SIP</td>
+          <td style="font-size:12.5px;">No action until 2028</td>
+          <td><span class="amount-chip">₹15–25L</span></td>
+          <td><div style="font-size:12px;color:var(--sage);font-weight:600;">✓ On track via SIP corpus</div></td>
+        </tr>
+        <tr>
+          <td><div class="goal-name">✈️ Travel & Personal</div><div class="goal-tag tag-short">Ongoing</div></td>
+          <td style="font-size:12px;color:var(--muted);">Annual</td>
+          <td style="font-size:12.5px;">30% of annual bonus</td>
+          <td style="font-size:12.5px;">Enjoy life — it's in the plan</td>
+          <td><span class="amount-chip">₹30–50k/yr</span></td>
+          <td><div style="font-size:12px;color:var(--sage);font-weight:600;">✓ Built into the plan</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-heading">SIP Step-Up Ladder</div>
+  <div class="section-sub">Small increases, massive long-term impact. Each step is small enough to barely feel it.</div>
+
+  <div class="goals-table" style="margin-bottom:28px;">
+    <table>
+      <thead>
+        <tr><th>When</th><th>SIP Amount</th><th>Change</th><th>What to do</th><th>Why now</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-size:13px;font-weight:600;">Now (May 2026)</td>
+          <td><span class="amount-chip">₹6,000</span></td>
+          <td style="color:var(--muted);font-size:12px;">Current</td>
+          <td style="font-size:12.5px;">Confirm Direct Growth</td>
+          <td style="font-size:12.5px;color:var(--muted);">Foundation set</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;font-weight:600;">Month 2 (Jun 2026)</td>
+          <td><span class="amount-chip">₹10,000</span></td>
+          <td style="color:var(--sage);font-size:12px;font-weight:700;">+₹4,000 ↑</td>
+          <td style="font-size:12.5px;">Same index fund</td>
+          <td style="font-size:12.5px;color:var(--muted);">Promotion raise captured</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;font-weight:600;">Month 6 (Oct 2026)</td>
+          <td><span class="amount-chip">₹13,000</span></td>
+          <td style="color:var(--sage);font-size:12px;font-weight:700;">+₹3,000 ↑</td>
+          <td style="font-size:12.5px;">Add flexi-cap fund optionally</td>
+          <td style="font-size:12.5px;color:var(--muted);">6 months comfortable</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;font-weight:600;">Month 12 (Apr 2027)</td>
+          <td><span class="amount-chip">₹15,000</span></td>
+          <td style="color:var(--sage);font-size:12px;font-weight:700;">+₹2,000 ↑</td>
+          <td style="font-size:12.5px;">₹10k Nifty 50 + ₹5k Flexi-cap</td>
+          <td style="font-size:12.5px;color:var(--muted);">Year 1 target reached 🎉</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;font-weight:600;">After wedding (2028)</td>
+          <td><span class="amount-chip">₹30,000</span></td>
+          <td style="color:#5B6EF5;font-size:12px;font-weight:700;">+₹15,000 ↑↑</td>
+          <td style="font-size:12.5px;">Redirect wedding RD here</td>
+          <td style="font-size:12.5px;color:var(--muted);">Biggest wealth jump in the plan</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-heading">What to Avoid</div>
+  <div class="section-sub">Equally important as what to do.</div>
+  <div class="avoid-grid">
+    <div class="avoid-card"><div class="avoid-icon">🚫</div><div><div class="avoid-title">ULIPs & Endowment Plans</div><div class="avoid-desc">These mix insurance and investment — badly. Charges eat 15–25% of your money in year 1. Buy term insurance separately (you don't need it yet at 26 with no dependents) and invest in mutual funds. Never combine the two.</div></div></div>
+    <div class="avoid-card"><div class="avoid-icon">🚫</div><div><div class="avoid-title">Wedding money in equity</div><div class="avoid-desc">Equity can fall 30% in 3 months. If your wedding is in 2 years, that money must be in FD or RD. Always. No exceptions. You cannot afford to delay the wedding because the market crashed.</div></div></div>
+    <div class="avoid-card"><div class="avoid-icon">🚫</div><div><div class="avoid-title">Crypto, F&O, Stock Tips</div><div class="avoid-desc">90%+ of retail F&O traders lose money — this is a verified SEBI statistic. Crypto is speculation, not investment. Stock tips are often paid promotions. None of these belong in a beginner's plan.</div></div></div>
+    <div class="avoid-card"><div class="avoid-icon">🚫</div><div><div class="avoid-title">Too many funds</div><div class="avoid-desc">The biggest mistake beginners make: opening 6–8 SIPs thinking more = better diversification. It doesn't. Two well-chosen funds (Nifty 50 + Flexi-cap) beat a cluttered portfolio of 8 funds. More funds = more confusion, not more returns.</div></div></div>
+    <div class="avoid-card"><div class="avoid-icon">🚫</div><div><div class="avoid-title">Selling SIPs when markets fall</div><div class="avoid-desc">Every market fall feels like "this time is different." It never is. Indian markets recovered from COVID (2020), demonetisation (2016), the 2008 global crash. Your job: do nothing. Keep the SIP. This patience is worth lakhs.</div></div></div>
+    <div class="avoid-card"><div class="avoid-icon">🚫</div><div><div class="avoid-title">NBFC FDs for short-term money</div><div class="avoid-desc">Shriram, Bajaj Finance FDs offer 8–9% interest but are not as safe as bank FDs. DICGC insurance covers bank FDs up to ₹5L per bank. For your emergency and wedding fund, use only nationalised or large private banks.</div></div></div>
+  </div>
+</div>
+
+<!-- ======= CHECKLIST ======= -->
+<div id="tab-checklist" class="tab-panel">
+  <div class="section-heading">30-Day Milestones</div>
+  <div class="section-sub">The first month is setup, not optimization. Because you already have ₹5L, most of these can be done in a single weekend.</div>
+
+  <div class="milestone-list">
+    <div class="milestone-item">
+      <div class="milestone-num">1</div>
+      <div>
+        <div class="milestone-text">Open FD #1 — ₹3.5L Emergency Fund</div>
+        <div class="milestone-sub">Bank app → Fixed Deposit → ₹3,50,000 → 1-year auto-renewable → label it "Emergency." Never touch it. Earns ~7% vs 3.5% in savings account.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">2</div>
+      <div>
+        <div class="milestone-text">Open FD #2 — ₹1.5L Wedding Seed</div>
+        <div class="milestone-sub">Bank app → Fixed Deposit → ₹1,50,000 → 2-year tenure → label it "Wedding." This grows to ₹1.72L by maturity at ~7% — completely hands-off.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">3</div>
+      <div>
+        <div class="milestone-text">Check your current ₹6k SIP — Direct or Regular?</div>
+        <div class="milestone-sub">Open MF app → fund details → check plan type. If it says "Regular," consider switching to Direct on Kuvera. Saves ₹8–15k over 5 years on just this SIP alone.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">4</div>
+      <div>
+        <div class="milestone-text">Register on MF Central</div>
+        <div class="milestone-sub">mfcentral.com → PAN + Aadhaar OTP login → see your full MF portfolio across all apps and AMCs in one place. Your financial x-ray.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">5</div>
+      <div>
+        <div class="milestone-text">Raise SIP from ₹6k → ₹10k on Kuvera or Groww</div>
+        <div class="milestone-sub">Modify existing SIP → increase amount → confirm auto-debit on salary date. Capture the promotion raise before it disappears into lifestyle spending.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">6</div>
+      <div>
+        <div class="milestone-text">Start ₹15k/month Wedding RD — automate on salary day</div>
+        <div class="milestone-sub">Bank app → Recurring Deposit → ₹15,000/month → 24-month tenure → auto-debit on salary credit date. In 24 months this builds ₹3.87L without thinking about it.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">7</div>
+      <div>
+        <div class="milestone-text">Set a ₹60k monthly expense ceiling</div>
+        <div class="milestone-sub">Write it down. Check your UPI/bank app weekly. If you've hit ₹50k by week 3, ease up for the last week. Lifestyle creep after a raise is invisible — this keeps it visible.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">8</div>
+      <div>
+        <div class="milestone-text">Book a free call with Ditto for health insurance</div>
+        <div class="milestone-sub">ditto.in → free, no-commission consultation → get a ₹5–10L personal health plan. ~₹8,000–13,000/year at age 26. Employer cover ends when you change jobs — your own policy stays forever.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">9</div>
+      <div>
+        <div class="milestone-text">Check EPF balance and activate UAN</div>
+        <div class="milestone-sub">EPFO mobile app or epfindia.gov.in → login with UAN → confirm employer is depositing monthly → link Aadhaar if not done. Never withdraw EPF when switching jobs — always transfer.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">10</div>
+      <div>
+        <div class="milestone-text">Write down your starting net worth</div>
+        <div class="milestone-sub">Emergency FD (₹3.5L) + Wedding FD (₹1.5L) + SIP current value + EPF balance = your net worth today. Note this date and amount. Compare every 6 months — the growth will motivate you.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">11</div>
+      <div>
+        <div class="milestone-text">Decide your bonus split before the bonus arrives</div>
+        <div class="milestone-sub">Decide now: 50% → wedding FD top-up, 30% → travel or personal treat, 20% → lump-sum SIP. A rule made in advance prevents the bonus from disappearing into impulse spending.</div>
+      </div>
+    </div>
+    <div class="milestone-item">
+      <div class="milestone-num">12</div>
+      <div>
+        <div class="milestone-text">Schedule a CA meeting for July — tax regime check</div>
+        <div class="milestone-sub">Old vs new regime decision affects whether you should do ELSS SIP. Your CA takes 15 minutes to calculate both — could save ₹15,000–40,000 in taxes per year. Book by end of June.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--sage-pale);border-radius:var(--radius);padding:20px 24px;border-left:4px solid var(--sage);">
+    <div style="font-weight:700;font-size:14px;color:#3D6B4F;margin-bottom:8px;">💚 The Good News</div>
+    <div style="font-size:13px;color:var(--slate);line-height:1.7;">With ₹5L already saved, milestones 1 and 2 can be done <strong>today</strong> — in under 10 minutes on your bank app. That immediately puts ₹3.5L to work earning 7% and locks in your wedding seed. Most 26-year-olds spend months building to this point. You're already there.</div>
+  </div>
+
+</div>
+
+<!-- ======= KNOWLEDGE HUB ======= -->
+<div id="tab-knowledge" class="tab-panel">
+  <div class="section-heading">Knowledge Hub</div>
+  <div class="section-sub">Everything a first-time investor in India needs to know. Apps, websites, companies, and concepts — explained simply, with no jargon.</div>
+
+  <!-- MUTUAL FUND APPS -->
+  <div class="app-category">
+    <div class="app-category-title">📱 Mutual Fund Investing Apps</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🌿</div><div><div class="app-name">Kuvera</div><div class="app-type">kuvera.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-best">⭐ Best for Long-Term</span></div>
+        <div class="app-desc">The gold standard for serious long-term investors. 100% free, zero commissions, only shows Direct plans. Features: goal-based investing, SIP automation, family portfolio, US stocks access, FD comparison. No ads, no gamification. If you use only one MF app, make it Kuvera.</div>
+        <div class="app-tags"><span class="app-tag">Direct Only</span><span class="app-tag">Free Forever</span><span class="app-tag">Goal Planning</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">💚</div><div><div class="app-name">Groww</div><div class="app-type">groww.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Good for Beginners</span></div>
+        <div class="app-desc">Simpler, friendlier UI than Kuvera. Great for someone just starting out. Offers Direct MF, stocks, IPOs, ETFs, and digital gold. Caution: the stocks and F&O sections can be tempting — stick to the SIP section only for now. Owned by a US-listed company, well regulated.</div>
+        <div class="app-tags"><span class="app-tag">Beginner Friendly</span><span class="app-tag">Direct MF</span><span class="app-tag">Stocks Too</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🔵</div><div><div class="app-name">Zerodha Coin</div><div class="app-type">coin.zerodha.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Good Alternative</span></div>
+        <div class="app-desc">Zerodha's mutual fund platform — clean, Direct plans only, free. Best if you already use Zerodha for stocks. Integrates your MF and stock portfolio in one view. Slightly more technical UI than Groww but very reliable. Backed by India's largest stock broker.</div>
+        <div class="app-tags"><span class="app-tag">Direct Only</span><span class="app-tag">Free</span><span class="app-tag navy">Zerodha Group</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🟠</div><div><div class="app-name">ET Money</div><div class="app-type">etmoney.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Good Features</span></div>
+        <div class="app-desc">Part of the Economic Times group. Has both Regular and Direct plans — make sure you pick Direct. Has a "Smart Deposit" feature for FDs, expense tracking, health insurance. Good for someone who wants everything in one app. SmartSwitch feature helps you move from Regular to Direct.</div>
+        <div class="app-tags"><span class="app-tag gold">All-in-One</span><span class="app-tag">FD Too</span><span class="app-tag">Insurance</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🟣</div><div><div class="app-name">Paytm Money</div><div class="app-type">paytmmoney.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Decent Option</span></div>
+        <div class="app-desc">Offers Direct MF, stocks, IPOs and NPS. Well integrated with Paytm UPI. Good for those already in the Paytm ecosystem. SIP automation works well. Interface has improved significantly. Not the first recommendation but a solid choice if you prefer Paytm.</div>
+        <div class="app-tags"><span class="app-tag">Direct MF</span><span class="app-tag">NPS</span><span class="app-tag">IPO</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🏛️</div><div><div class="app-name">AMC Websites Directly</div><div class="app-type">e.g. mfoline.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-official">🏛️ Official Source</span></div>
+        <div class="app-desc">You can invest directly at any AMC's website (HDFC MF, SBI MF, Mirae, Nippon etc.). This is the most "pure" direct route — no middleman at all. Slightly more effort to set up but gives full control. MF Online (mfoline.com) is a multi-AMC direct platform run by CAMS.</div>
+        <div class="app-tags"><span class="app-tag navy">Zero Commission</span><span class="app-tag navy">Official</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKING & PORTFOLIO -->
+  <div class="app-category">
+    <div class="app-category-title">📊 Portfolio Tracking & Management</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🏦</div><div><div class="app-name">MF Central</div><div class="app-type">mfcentral.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-official">🏛️ Government-Backed</span></div>
+        <div class="app-desc">The official AMFI-backed platform. Login with PAN to see every mutual fund you hold across ALL apps and AMCs in one place. Use it to: view portfolio, request account statements, switch from Regular to Direct, change bank details, update nominees, consolidate folios. Not for buying — for managing and tracking.</div>
+        <div class="app-tags"><span class="app-tag navy">Mandatory to Know</span><span class="app-tag navy">All AMCs</span><span class="app-tag navy">PAN Login</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">💰</div><div><div class="app-name">Tickertape</div><div class="app-type">tickertape.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Research Tool</span></div>
+        <div class="app-desc">India's best free MF and stock research tool. Screener, fund comparison, portfolio analyser, overlap checker (to see if your two SIPs hold the same stocks). Use it to research a fund before starting a SIP. Owned by Smallcase Technologies. Completely free for basic features.</div>
+        <div class="app-tags"><span class="app-tag">Fund Research</span><span class="app-tag">Overlap Check</span><span class="app-tag">Free</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">📈</div><div><div class="app-name">Value Research Online</div><div class="app-type">valueresearchonline.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Trusted Since 1990s</span></div>
+        <div class="app-desc">India's oldest and most trusted MF rating and research site. Every fund has a star rating (1–5 stars). Shows historical returns, risk metrics, portfolio holdings, expense ratios. The VRO rating is used by millions of investors to compare funds. Great for verifying a fund recommendation before investing.</div>
+        <div class="app-tags"><span class="app-tag">Fund Ratings</span><span class="app-tag">Returns Data</span><span class="app-tag">Comparison</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BANKING & FD -->
+  <div class="app-category">
+    <div class="app-category-title">🏦 Banking, FD & Savings</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🟢</div><div><div class="app-name">Your Primary Bank App</div><div class="app-type">HDFC / ICICI / SBI / Kotak</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-best">⭐ Primary Hub</span></div>
+        <div class="app-desc">Your bank app is where your emergency FD, wedding RD, and sweep FD live. All big banks now let you open FDs and RDs in-app in under 2 minutes. HDFC and ICICI have the best digital banking experience. SBI is the safest (government-backed). Kotak has a savings account with 3.5–4% interest (one of the best rates).</div>
+        <div class="app-tags"><span class="app-tag">Emergency FD</span><span class="app-tag">Wedding RD</span><span class="app-tag">DICGC Safe</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">💹</div><div><div class="app-name">Stable Money</div><div class="app-type">stablemoney.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 FD Comparison</span></div>
+        <div class="app-desc">Compares FD rates across all banks in India in real-time. Shows which bank is offering the best rate for your tenure. Can also invest in FDs directly. Useful when your bank FD rate seems low — check if another bank gives 0.25–0.5% more for the same period. Small difference on ₹3.5L adds up.</div>
+        <div class="app-tags"><span class="app-tag gold">FD Rates</span><span class="app-tag gold">Comparison</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🏪</div><div><div class="app-name">Small Finance Banks</div><div class="app-type">AU / Ujjivan / ESAF</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Higher FD Rates</span></div>
+        <div class="app-desc">Small Finance Banks like AU Small Finance Bank, Ujjivan, Jana Bank offer FD rates of 8–9% — significantly higher than large banks. They are RBI-licensed and DICGC-insured up to ₹5L just like large banks. Good option for FDs where safety is maintained but return is better. Don't put more than ₹5L in any single bank.</div>
+        <div class="app-tags"><span class="app-tag gold">Higher Returns</span><span class="app-tag">RBI Licensed</span><span class="app-tag">DICGC Safe</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSURANCE -->
+  <div class="app-category">
+    <div class="app-category-title">🛡️ Insurance — Health & Life</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🎯</div><div><div class="app-name">Ditto Insurance</div><div class="app-type">ditto.in · by Zerodha</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-best">⭐ Best Advice</span></div>
+        <div class="app-desc">Free, unbiased insurance consultation by a real human advisor. Zero commission — they don't earn if you buy more. Ditto advisors explain exactly what you need and what to skip. Get your personal health plan and (when needed) term life plan here. Highly recommended by India's top personal finance communities.</div>
+        <div class="app-tags"><span class="app-tag">Free Advice</span><span class="app-tag">No Commission</span><span class="app-tag navy">Zerodha Backed</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🔍</div><div><div class="app-name">Policybazaar</div><div class="app-type">policybazaar.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Good Comparison</span></div>
+        <div class="app-desc">India's largest insurance comparison platform. Good for comparing health and term insurance plans side by side — premium, coverage, hospital network, claim settlement ratio. Note: agents may push you toward higher-commission products. Use it to compare options, but validate the recommendation independently or via Ditto.</div>
+        <div class="app-tags"><span class="app-tag gold">Wide Comparison</span><span class="app-tag gold">All Insurers</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🏥</div><div><div class="app-name">Top Health Insurers</div><div class="app-type">Niva Bupa · Care · Star</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Recommended Brands</span></div>
+        <div class="app-desc">For personal health insurance in India: Niva Bupa (formerly Max Bupa) — excellent claim settlement. Care Health — good for young individuals, affordable. Star Health — large hospital network. HDFC Ergo — tech-forward. Check the claim settlement ratio (higher = better) before buying. Aim for 90%+.</div>
+        <div class="app-tags"><span class="app-tag">Health Insurance</span><span class="app-tag">₹5–10L Cover</span><span class="app-tag">₹8–13k/year</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EPF & RETIREMENT -->
+  <div class="app-category">
+    <div class="app-category-title">🏛️ Government Schemes — EPF, NPS, PPF</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">📱</div><div><div class="app-name">EPFO / Umang App</div><div class="app-type">epfindia.gov.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-official">🏛️ Government</span></div>
+        <div class="app-desc">Track your EPF balance, passbook, and employer contributions. Activate your UAN (Universal Account Number) — this is your EPF identity for life, even when you change jobs. Link Aadhaar to UAN to avoid delays in withdrawal. Transfer (don't withdraw) EPF when switching jobs — you lose interest if you withdraw early and pay tax on it.</div>
+        <div class="app-tags"><span class="app-tag navy">EPF Balance</span><span class="app-tag navy">UAN Activation</span><span class="app-tag navy">8.15% Guaranteed</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🏦</div><div><div class="app-name">NPS (Protean / eNPS)</div><div class="app-type">enps.nsdl.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Consider at Year 4</span></div>
+        <div class="app-desc">National Pension System — a government retirement scheme managed by PFRDA. Additional ₹50,000 tax deduction under 80CCD(1B) beyond the ₹1.5L 80C limit. Invests in equity + debt mix. Lock-in until age 60 (with partial withdrawal allowed). Recommended to start at Year 3–4 when your income is higher and tax burden is meaningful.</div>
+        <div class="app-tags"><span class="app-tag gold">Extra Tax Saving</span><span class="app-tag gold">₹50k Deduction</span><span class="app-tag">Retirement</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">📮</div><div><div class="app-name">PPF (Post Office / Banks)</div><div class="app-type">~7.1% Guaranteed</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Super Safe Option</span></div>
+        <div class="app-desc">Public Provident Fund — 15-year lock-in, 7.1% interest (government-set, tax-free returns), ₹1.5L/year max. Great for the ultra-conservative portion of retirement savings. Available at any post office or nationalised bank. The interest is completely tax-free — one of the few truly tax-free investment options in India. Optional addition in Year 3+.</div>
+        <div class="app-tags"><span class="app-tag">Tax-Free Returns</span><span class="app-tag">100% Safe</span><span class="app-tag">15-Year Lock</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAX & FINANCE TOOLS -->
+  <div class="app-category">
+    <div class="app-category-title">🧮 Tax Filing & Financial Tools</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">📑</div><div><div class="app-name">ClearTax</div><div class="app-type">cleartax.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 ITR Filing</span></div>
+        <div class="app-desc">India's most popular tax filing platform. Handles ITR-1 and ITR-2 (for salary + capital gains). Auto-imports Form 26AS and AIS data. Has a tax calculator, regime comparison tool, and access to CAs if needed. Free for basic filing, small fee for CA-assisted filing. Good as a backup tool even if you use a CA.</div>
+        <div class="app-tags"><span class="app-tag">ITR Filing</span><span class="app-tag">Tax Calculator</span><span class="app-tag">Capital Gains</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🏛️</div><div><div class="app-name">Income Tax Portal</div><div class="app-type">incometax.gov.in</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-official">🏛️ Official</span></div>
+        <div class="app-desc">The official government ITR portal. Check Form 26AS (all taxes deducted in your name), Annual Information Statement (AIS) — which shows all your financial transactions reported to IT department including SIP redemptions, FD interest, and salary. Always check AIS before filing — it shows what the government already knows about you.</div>
+        <div class="app-tags"><span class="app-tag navy">Form 26AS</span><span class="app-tag navy">AIS Statement</span><span class="app-tag navy">Official ITR</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">💬</div><div><div class="app-name">Freefincal</div><div class="app-type">freefincal.com</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Best Free Calculators</span></div>
+        <div class="app-desc">Run by Prof. Pattabiraman of IIT Madras — India's most thorough personal finance blog. Has free calculators for SIP returns, retirement corpus, loan EMI, PPF, NPS and more. No sponsored content, no affiliate bias. Highly technical but honest. Use the SIP calculator here to model what your ₹15k/month becomes in 20 years.</div>
+        <div class="app-tags"><span class="app-tag">Free Calculators</span><span class="app-tag">No Bias</span><span class="app-tag">Deep Research</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEARNING RESOURCES -->
+  <div class="app-category">
+    <div class="app-category-title">📚 Learning Resources (Trusted, Unbiased)</div>
+    <div class="knowledge-grid">
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🎥</div><div><div class="app-name">Zerodha Varsity</div><div class="app-type">zerodha.com/varsity</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-best">⭐ Best Free Course</span></div>
+        <div class="app-desc">India's best free finance education platform. Covers personal finance, mutual funds, stocks, options, bonds — from beginner to advanced. Written by market professionals. No sales pitch, no product promotion. Completely free. Module 1 (Introduction to Stock Markets) and Module 11 (Personal Finance) are most relevant for you right now.</div>
+        <div class="app-tags"><span class="app-tag">Free Course</span><span class="app-tag">Beginner Friendly</span><span class="app-tag navy">Zerodha</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">🎙️</div><div><div class="app-name">Paisa Vaisa Podcast</div><div class="app-type">Anupam Gupta</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-best">⭐ Best Hindi Podcast</span></div>
+        <div class="app-desc">India's top personal finance podcast. Hosted by Anupam Gupta — clear, no-nonsense, episodes cover everything from SIPs to real estate to insurance to taxes. Available on Spotify and all podcast apps. Episodes are 30–45 minutes. Great for learning while commuting. Start with the "Mutual Funds for Beginners" episode series.</div>
+        <div class="app-tags"><span class="app-tag">Hindi &amp; English</span><span class="app-tag">Podcast</span><span class="app-tag">No Product Push</span></div>
+      </div>
+      <div class="app-card">
+        <div class="app-header"><div class="app-emoji">📰</div><div><div class="app-name">Reddit r/IndiaInvestments</div><div class="app-type">reddit.com/r/IndiaInvestments</div></div></div>
+        <div class="app-rating"><span class="rating-badge rb-good">👍 Community Wisdom</span></div>
+        <div class="app-desc">India's best personal finance community online. Real people sharing real experiences. Has a comprehensive wiki covering SIPs, emergency funds, insurance, tax, and common scams. Mods are strict about removing spam and bad advice. Great for asking questions like "should I switch my fund?" or "is this insurance plan a scam?" Always cross-check with the wiki first.</div>
+        <div class="app-tags"><span class="app-tag">Community Q&amp;A</span><span class="app-tag">Wiki</span><span class="app-tag">Peer Reviewed</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPTS -->
+  <div class="knowledge-section-label">💡 Key Concepts — Explained in Plain Language</div>
+  <div class="knowledge-section-sub">Tap each to expand. Read these once, understand them forever.</div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">📈</div><div class="concept-title">SIP — What it is and why it's powerful</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      A SIP (Systematic Investment Plan) is a fixed monthly amount invested in a mutual fund — like an EMI but for your future self. Every month on a fixed date, the amount is auto-debited and units of the fund are purchased.<br><br>
+      <strong>Why it works:</strong> You buy fewer units when markets are high, more units when markets are low. Over time this "rupee cost averaging" smooths out volatility and gives better returns than trying to time the market. 99% of people who try to time the market fail. SIP removes the need to be clever.<br><br>
+      <div class="concept-highlight">₹10,000/month SIP in Nifty 50 index fund for 20 years at 11% CAGR = approximately ₹80 lakhs. With step-ups, it could be ₹1.2–1.5 crore.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">🔄</div><div class="concept-title">Direct vs Regular Mutual Fund — The Hidden Cost</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      Every mutual fund comes in two versions: Regular and Direct.<br><br>
+      <strong>Regular plan:</strong> You invest through a broker or bank. They earn a commission (called "trail commission") of 0.5–1.2% every year from the fund. This is deducted from your returns silently — you never see it as a charge.<br><br>
+      <strong>Direct plan:</strong> You invest directly through the AMC website, Kuvera, Groww, or MF Central. No middleman = no commission = you get 0.5–1.2% more returns every year.<br><br>
+      <div class="concept-highlight">On ₹15,000/month SIP over 20 years, the difference between Direct and Regular is approximately ₹12–18 lakhs. Same fund, same market — just the plan type.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">📊</div><div class="concept-title">Index Fund vs Active Fund — Why Simple Wins</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      <strong>Index Fund:</strong> Copies a market index like Nifty 50 (top 50 Indian companies by size). A computer automatically buys all 50 stocks in the right proportion. No fund manager trying to be clever. Expense ratio: 0.05–0.2%.<br><br>
+      <strong>Active Fund:</strong> A human fund manager picks stocks trying to beat the index. Expense ratio: 0.5–1.5%. Fund manager may be great or may not be — and you don't know in advance.<br><br>
+      <strong>The uncomfortable truth:</strong> Over 10+ years, 80% of active funds underperform their benchmark index after fees. This is a global phenomenon, not just India. The remaining 20% that outperform — you cannot identify them in advance.<br><br>
+      <div class="concept-highlight">For a beginner or even an experienced investor, a Nifty 50 or Nifty 500 index fund is the most reliable long-term choice. Add one flexi-cap fund for active selection. That's it.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">💰</div><div class="concept-title">FD vs RD vs Liquid Fund — When to Use Which</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      <strong>Fixed Deposit (FD):</strong> Lump sum locked for a fixed period. 6.5–7.5% at large banks, 8–9% at small finance banks. Interest is taxable as income. Best for: emergency fund, wedding seed money you already have. DICGC insured up to ₹5L per bank.<br><br>
+      <strong>Recurring Deposit (RD):</strong> Fixed monthly deposit, auto-debited. Same interest as FD. Best for: building a goal fund month by month (like your ₹15k/month wedding RD). Interest is taxable.<br><br>
+      <strong>Liquid Fund:</strong> A type of mutual fund that invests in very short-term government/corporate debt. Returns ~6.5–7.5%, slightly better than savings account. Can be redeemed in 1 day. Best for: parking money you might need quickly, like a 3-month emergency buffer on top of your FD. Safer than equity but slightly less than FD.<br><br>
+      <div class="concept-highlight">Rule: Emergency fund in FD. Wedding money in RD → then FD. Anything you might need within 24 hours in Liquid Fund or savings account.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">🛡️</div><div class="concept-title">EPF — India's Most Underrated Wealth Builder</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      Your employer deducts 12% of your basic salary every month for EPF. They also contribute 12% from their side (though 8.33% of that goes into EPS — the pension scheme). The EPF earns 8.15% interest, declared by the government yearly. This is completely tax-free if you withdraw after 5 years of continuous service.<br><br>
+      <strong>Critical rules:</strong><br>
+      <ul>
+        <li>Never withdraw EPF when changing jobs — transfer it using UAN. Withdrawal is taxed and you lose compounding.</li>
+        <li>Activate your UAN on the EPFO portal. Link Aadhaar to it.</li>
+        <li>Check your EPF passbook every 6 months to ensure employer is depositing.</li>
+        <li>After 10 years of contributions you're eligible for a pension (EPS) at age 58.</li>
+      </ul>
+      <div class="concept-highlight">EPF is essentially 8.15% guaranteed, tax-free return. No investment product in India beats this risk-return ratio for the same safety level. Never underestimate it.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">🧮</div><div class="concept-title">Old Tax Regime vs New Tax Regime — Which to Pick</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      India gives you a choice every year: file under the Old Regime (claim deductions, higher slabs) or New Regime (lower slabs, almost no deductions). Since FY 2024-25, the New Regime is the default.<br><br>
+      <strong>Old Regime benefits you if:</strong> You claim HRA (rent deduction), invest ₹1.5L+ under 80C (EPF + ELSS), pay health insurance premium (₹25k deduction under 80D), and have home loan interest.<br><br>
+      <strong>New Regime benefits you if:</strong> You don't have many deductions, or your income is under ₹7L (zero tax under New Regime).<br><br>
+      <strong>At your salary (₹72k–92k/month = ₹8.6–11L/year):</strong> The old regime often wins if you're paying rent, investing in EPF, and doing ELSS. But the exact answer depends on your HRA and deductions — ask your CA every April to run the numbers for both regimes before deciding.<br><br>
+      <div class="concept-highlight">Switching regimes every year is allowed. Calculate both, pick the lower tax. Your CA takes 15 minutes to do this — it could save ₹15,000–40,000 per year.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">📉</div><div class="concept-title">What To Do When Markets Fall (The Most Important Lesson)</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      Markets will fall. Not maybe — will. Indian markets have crashed 30–50% multiple times: 2008, 2011, 2015, 2018, 2020 (COVID), 2022. Every time, the media said "this time is different." Every time, markets recovered to new highs within 1–3 years.<br><br>
+      <strong>What most people do (wrong):</strong> Panic → sell at the bottom → miss the recovery → buy back at higher prices. This locks in losses permanently.<br><br>
+      <strong>What you should do:</strong> Nothing. Your SIP continues automatically. You buy more units at cheaper prices. If you have extra cash, it's actually a good time to invest a lump sum.<br><br>
+      <strong>The only exception:</strong> If the money was needed within 3 years, it should never have been in equity to begin with. That's why your wedding money is in FD, not SIP.<br><br>
+      <div class="concept-highlight">Write this on paper and put it somewhere visible: "My SIP runs no matter what happens in the news. I will not check the value more than once a month."</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">🔑</div><div class="concept-title">Compounding — Why Starting at 26 is a Superpower</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      Compounding means earning returns on your returns. The longer the time, the more explosive the growth. This is not a metaphor — the math is genuinely dramatic.<br><br>
+      <strong>Example:</strong> ₹10,000/month SIP at 11% CAGR:
+      <ul>
+        <li>After 10 years: ~₹20.6L invested → grows to ~₹22L (modest)</li>
+        <li>After 20 years: ~₹24L invested → grows to ~₹80L</li>
+        <li>After 30 years: ~₹36L invested → grows to ~₹2.3 crore</li>
+      </ul>
+      The jump from 20 to 30 years is enormous because the last 10 years compound on a much larger base. Starting at 26 vs 36 is literally the difference between ₹2.3Cr and ₹80L for the same monthly investment.<br><br>
+      <div class="concept-highlight">Your biggest financial advantage right now isn't your salary or your savings. It's your age. Every year you delay starting a SIP costs you roughly ₹15–20L in eventual wealth. You've already started — that's the most important thing.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">💡</div><div class="concept-title">ELSS — Tax Saving + Investment in One</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      ELSS (Equity Linked Savings Scheme) is a mutual fund that qualifies for Section 80C deduction. Up to ₹1.5L invested per year reduces your taxable income by that amount under the Old Tax Regime.<br><br>
+      <strong>Why ELSS is better than other 80C options:</strong><br>
+      <ul>
+        <li>PPF: 15-year lock-in. ELSS: only 3-year lock-in.</li>
+        <li>NSC/KVP: Fixed ~7% returns. ELSS: equity returns (historically 12–14%).</li>
+        <li>Tax-saving FD: 5-year lock. ELSS: 3-year lock.</li>
+      </ul>
+      <strong>How it fits your plan:</strong> Your EPF already contributes to 80C. If EPF contribution is less than ₹1.5L/year, top up with ELSS SIP to fill the remaining gap. Discuss with CA in January each year.<br><br>
+      <div class="concept-highlight">An ELSS SIP of ₹5,000/month (₹60k/year) gives you ₹60k in tax deduction AND equity market returns. It's the smartest way to save tax for a salaried professional.</div>
+    </div>
+  </div>
+
+  <div class="concept-card">
+    <div class="concept-header" onclick="toggleConcept(this)"><div class="concept-icon">⚖️</div><div class="concept-title">Expense Ratio — The Fee That Silently Eats Your Returns</div><div class="concept-chevron">▾</div></div>
+    <div class="concept-body">
+      Every mutual fund charges an annual fee called the expense ratio. It's a percentage of your total invested amount, deducted daily from the fund's NAV — you never see it as a separate charge, which is why it's often ignored.<br><br>
+      <strong>Typical expense ratios:</strong><br>
+      <ul>
+        <li>Index Fund (Direct): 0.05–0.2%</li>
+        <li>Active Fund (Direct): 0.5–1.2%</li>
+        <li>Active Fund (Regular): 1.0–2.0%</li>
+      </ul>
+      <strong>What this means in rupees:</strong> On ₹10L corpus, a 1.5% expense ratio costs ₹15,000/year — every year. A 0.1% index fund costs ₹1,000/year. Over 20 years the difference compounds to lakhs.<br><br>
+      <div class="concept-highlight">Always check the expense ratio before starting a SIP. For your funds: index fund should be under 0.2%, flexi-cap fund should be under 0.8% (Direct plan).</div>
+    </div>
+  </div>
+
+  <div style="margin-top:28px;background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:var(--radius);padding:20px 24px;">
+    <div style="font-weight:700;font-size:14px;color:#9A7A2E;margin-bottom:8px;">⚠️ Important Disclaimer</div>
+    <div style="font-size:12.5px;color:var(--slate);line-height:1.7;">This dashboard is for educational planning purposes only and is created with care and love for Pratyasha by her family. Always confirm tax strategy, product suitability, and investment decisions with a qualified CA or SEBI-registered financial advisor before acting. Market investments are subject to risk. Past returns are not a guarantee of future performance.</div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+function switchTab(name, e) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  e.currentTarget.classList.add('active');
+}
+
+function toggleConcept(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.concept-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.concept-header').forEach(h => h.classList.remove('open'));
+  if (!isOpen) { body.classList.add('open'); header.classList.add('open'); }
+}
+</script>
 </body>
 </html>
